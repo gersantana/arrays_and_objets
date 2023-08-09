@@ -53,6 +53,10 @@ const propiedadesJSON = [
 let habitaciones;
 let tamañoMin;
 let tamañoMax;
+const botonBuscar = document.getElementById('buscar')
+const totalPropiedades = document.getElementById("total_busqueda")
+const seccionPropiedades = document.querySelector(".propiedades")
+
 
 const inputs = () => {
   habitaciones = parseInt(document.getElementById('habitaciones').value)
@@ -60,26 +64,10 @@ const inputs = () => {
   tamañoMax = parseInt(document.getElementById('tamaño_max').value)
 }
 
-const botonBuscar = document.getElementById('buscar')
-
-botonBuscar.addEventListener("click", () => {
-  inputs()
-  if (isNaN(habitaciones) || isNaN(tamañoMin) || isNaN(tamañoMax)) {
-    alert("Debes llenar todos los campos correspondientes.")
-  } else if (habitaciones < 1 || tamañoMax < 1) {
-    alert(`La "CANTIDAD" de habitaciones o el tamaño ""MAXIMO no puede ser "0"`)
-  } else if (tamañoMin > tamañoMax) {
-    alert(`El tamaño "MINIMO" de la propiedad debe ser menor que el tamaño "MAXIMO"`)
-  } else if (tamañoMin < 0) {
-    alert(`El tamaño "MINIMO" debe ser "MAYOR" o "IGUAl" a "0"`)
-  }
-})
-
-const seccionPropiedades = document.querySelector(".propiedades")
-let html = ""
-
-for (let propiedad of propiedadesJSON) {
-  html += `
+const mostrarPropiedades = (propiedades) => {
+  let iteracion = ""
+  for (let propiedad of propiedades) {
+    iteracion += `
 <div class="propiedad">
     <img class="img" src="${propiedad.src}" alt="">
   <section>
@@ -92,12 +80,33 @@ for (let propiedad of propiedadesJSON) {
     <button class="btn btn-info">Ver más</button>
   </section>
 </div>`
+  }
+  seccionPropiedades.innerHTML = iteracion
 }
-seccionPropiedades.innerHTML = html
 
+totalPropiedades.textContent = propiedadesJSON.length;
 
+mostrarPropiedades(propiedadesJSON);
 
-
-
-
-
+botonBuscar.addEventListener("click", () => {
+  inputs()
+  if (isNaN(habitaciones) || isNaN(tamañoMin) || isNaN(tamañoMax)) {
+    alert("Debes llenar todos los campos correspondientes.")
+  } else if (habitaciones < 1 || tamañoMax < 1) {
+    alert(`La "CANTIDAD" de habitaciones o el tamaño ""MAXIMO no puede ser "0"`)
+  } else if (tamañoMin > tamañoMax) {
+    alert(`El tamaño "MINIMO" de la propiedad debe ser menor que el tamaño "MAXIMO"`)
+  } else if (tamañoMin < 0) {
+    alert(`El tamaño "MINIMO" debe ser "MAYOR" o "IGUAl" a "0"`)
+  } else {
+    const propiedadesFiltradas = propiedadesJSON.filter(propiedad => {
+      return (
+        propiedad.rooms === habitaciones &&
+        propiedad.m >= tamañoMin &&
+        propiedad.m <= tamañoMax
+      );
+    });
+    mostrarPropiedades(propiedadesFiltradas);
+    totalPropiedades.innerHTML = propiedadesFiltradas.length
+  }
+})
